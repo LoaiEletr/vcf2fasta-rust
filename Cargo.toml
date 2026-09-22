@@ -1,0 +1,61 @@
+[package]
+name = "vcf2fasta"
+version = "1.0.0"
+edition = "2024"
+authors = ["Loai Eletr <loai.3tr@gmail.com>", "Abyot Melkamu <abyot@pusan.ac.kr>", "Jeongbin Park <jeongbin.park@pusan.ac.kr>"]
+description = "Generate per-sample, per-haplotype FASTA files from an indexed VCF/BCF"
+license = "MIT"
+repository = "https://github.com/LoaiEletr/vcf2fasta"
+readme = "README.md"
+keywords = ["bioinformatics", "vcf", "fasta", "genomics", "haplotype"]
+categories = ["science", "command-line-utilities"]
+
+[features]
+default = []
+cuda = ["dep:cudarc"]
+
+[[bin]]
+name = "vcf2fasta"
+path = "src/main.rs"
+
+[lib]
+name = "vcf2fasta"
+path = "src/lib.rs"
+
+# ---------------------------------------------------------------------------
+# Benchmarks
+# ---------------------------------------------------------------------------
+# `harness = false` is REQUIRED for Criterion. Without it, Cargo uses
+# libtest as the bench harness, which silently reports "0 tests" and
+# rejects Criterion-specific flags like --warm-up-time.
+[[bench]]
+name = "vcf2fasta"
+path = "benches/vcf2fasta.rs"
+harness = false
+
+[dependencies]
+anyhow = "1.0"
+chrono = "0.4"
+clap = { version = "4", features = ["derive"] }
+crossbeam-channel = "0.5"
+flate2 = "1"
+libc = "0.2"
+memchr = "2"
+noodles = { version = "0.29", features = ["vcf", "bgzf"] }
+rayon = "1"
+rust-htslib = "1.0"
+smallvec = "1"
+tempfile = "3"
+
+cudarc = { version = "0.19.9", optional = true, features = ["nvrtc", "cuda-12060"] }
+
+[dev-dependencies]
+assert_cmd = "2"
+predicates = "3"
+tempfile = "3"
+wait-timeout = "0.2"
+criterion = { version = "0.5", features = ["html_reports"] }
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
